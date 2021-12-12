@@ -1,7 +1,7 @@
 <script>
-	export let elevated;
-	export let filled;
-	export let outlined;
+	export let elevated = undefined;
+	export let filled = undefined;
+	export let outlined = undefined;
 </script>
 
 <div class:elevated class:filled class:outlined>
