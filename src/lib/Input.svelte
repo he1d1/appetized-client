@@ -8,10 +8,10 @@
 		inline = false,
 		error: string | null = null,
 		required = false,
+		changed = false,
 		type = 'text';
 
-	let changed = false,
-		input: HTMLInputElement;
+	let input: HTMLInputElement;
 
 	// Bypasses error check for dynamically setting value of type.
 	$: input?.setAttribute('type', type);
@@ -36,6 +36,7 @@
 		class:error={changed && error}
 		id={label.toLowerCase()}
 		bind:value
+		on:keypress
 		{...$$props}
 		{placeholder}
 	/>
