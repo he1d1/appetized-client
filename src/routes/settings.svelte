@@ -1,12 +1,87 @@
 <script>
-	import Card from '../components/Card.svelte';
-	import { settings, prefersDark } from '../stores';
+	import Card from '../lib/Card.svelte';
+	import { settings, prefersDark, authed, user } from '../stores';
+	import Button from '$lib/Button.svelte';
+	import { gql } from '$lib/gql';
+	import { goto, prefetch } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import Skelly from '$lib/Skelly.svelte';
+
+	let logoutError = null;
+
+	let promise = null;
+	onMount(async () => {
+		let missing = [];
+		if (typeof $user.name === 'undefined') {
+			missing.push('name');
+		}
+		if (typeof $user.username === 'undefined') {
+			missing.push('username');
+		}
+
+		// TODO implement images
+		// if (typeof $user.profilePicture === 'undefined') {
+		// 	missing.push('profilePicture');
+		// }
+
+		if (!missing.length) return; // no missing fields
+
+		promise = await gql(
+			{
+				query: `{getUser{${JSON.stringify(missing).replace(/([["\]])/g, '')}}}`
+			},
+			(data) => {
+				user.set({ ...$user, ...data?.getUser });
+				console.log($user);
+			}
+		);
+	});
 </script>
+
+<Card outlined>
+	{#if $authed}
+		<div class="profile-pic">&nbsp;</div>
+
+		{#if typeof $user.name === 'undefined'}
+			<Skelly />
+		{:else if $user.name !== ''}
+			<div>
+				<h2>{$user.name}</h2>
+				<small>@{$user.username}</small>
+			</div>
+		{:else}
+			<h2>{$user.username}</h2>
+		{/if}
+		<Button
+			outlined
+			on:click={() =>
+				gql(
+					{
+						query: `mutation{logout{success}}`
+					},
+					(data, errors) => {
+						if (data?.logout?.success) {
+							authed.set(false);
+						} else logoutError = errors?.[0]?.message;
+					}
+				)}>Logout</Button
+		> <span class="error">{logoutError ?? ''}</span>
+	{:else}
+		<div class="login container">
+			<span>You are not logged in.</span>
+			<Button secondary on:mouseenter={() => prefetch('/sign-in')} on:click={() => goto('/sign-in')}
+				>Login
+			</Button>
+			<Button primary on:mouseenter={() => prefetch('/sign-up')} on:click={() => goto('/sign-up')}
+				>Sign Up
+			</Button>
+		</div>
+	{/if}
+</Card>
 
 <Card elevated>
 	<div id="theme">
 		<h3>Theme</h3>
-		<hr />
 		<label>
 			<input type="radio" bind:group={$settings.dark} name="appearance" value={null} />
 			System Default ({$prefersDark ? 'Dark' : 'Light'})
@@ -25,11 +100,32 @@
 </Card>
 
 <style>
+	.login.container {
+		display: flex;
+		justify-content: end;
+		align-items: center;
+		height: 100%;
+		gap: 1rem;
+	}
+	.login.container > span {
+		flex: 1 1 0;
+	}
+	.profile-pic {
+		width: 100px;
+		height: 100px;
+		border-radius: 50%;
+		background-color: #eee;
+	}
+
 	#theme {
 		color: var(--on-surface);
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
+	}
+
+	.error {
+		color: var(--error);
 	}
 
 	label {
