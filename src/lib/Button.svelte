@@ -7,15 +7,17 @@
 	export let outlined = false;
 	export let disabled = false;
 	export let text = false;
+	export let wide = undefined;
 </script>
 
 <button
-	class:disabled
 	class:primary
 	class:secondary
 	class:tertiary
 	class:outlined
 	class:text
+	class:disabled
+	class:wide
 	class:dark={$dark}
 	on:click
 	tabindex={disabled ? 1 : 0}
@@ -31,7 +33,7 @@
 		cursor: pointer;
 		padding: 12px 20px;
 		outline: none;
-
+		width: fit-content;
 		/* Text */
 		font-size: 16px;
 		font-weight: 600;
@@ -57,6 +59,10 @@
 		pointer-events: none;
 		transition: opacity 100ms ease-in-out, border 100ms ease-in-out;
 		opacity: 0;
+	}
+
+	.wide {
+		width: 100%;
 	}
 
 	.primary {
