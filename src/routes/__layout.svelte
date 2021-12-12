@@ -1,84 +1,150 @@
-<script lang="ts">
+<script context="module">
+	export const load = async ({ page }) => ({
+		props: {
+			path: page.path
+		}
+	});
+</script>
+
+<script>
 	import { onMount } from 'svelte';
-	import { dark, settings, Settings, prefersDark } from '../stores';
-	import Menu from 'svelte-material-icons/Menu.svelte';
+	import { dark, settings, prefersDark, authed, user, fab } from '../stores';
 	import Home from 'svelte-material-icons/Home.svelte';
 	import Search from 'svelte-material-icons/Magnify.svelte';
 	import Profile from 'svelte-material-icons/AccountCircle.svelte';
+	import Login from 'svelte-material-icons/Login.svelte';
+	import Saved from 'svelte-material-icons/Bookmark.svelte';
+	import Add from 'svelte-material-icons/Plus.svelte';
 	import Pencil from 'svelte-material-icons/Pencil.svelte';
 	import Cog from 'svelte-material-icons/Settings.svelte';
-	import FloatingActionButton from '../components/FloatingActionButton.svelte';
+	import FloatingActionButton from '../lib/FloatingActionButton.svelte';
 	import { page } from '$app/stores';
 	import { goto, prefetch } from '$app/navigation';
 	import { fade, fly } from 'svelte/transition';
+	import { gql } from '$lib/gql';
+
+	export let path;
+
+	$: console.log(path);
 
 	let settingsStore = null;
 
-	const hamburger = false;
 	const myProfile = true;
 
 	const pages = [
 		{ route: '/', icon: Home, label: 'Home', fab: Search, auth: null },
+		{ route: '/new', icon: Add, label: 'Create', fab: null, auth: true },
+		{
+			route: '/saved',
+			icon: Saved,
+			label: 'Saved',
+			fab: null,
+			auth: true
+		},
 		{
 			route: '/profile',
 			icon: Profile,
 			label: 'Profile',
-			fab: myProfile ? Pencil : null,
+			fab: myProfile ? Cog : null,
 			auth: true
+		},
+		{
+			route: '/sign-in',
+			icon: Login,
+			label: 'Sign In',
+			fab: null,
+			auth: false
+		},
+		{
+			route: '/sign-up',
+			icon: Profile,
+			label: 'Register',
+			fab: null,
+			auth: false
 		},
 		{
 			route: '/settings',
 			icon: Cog,
 			label: 'Settings',
 			fab: null,
-			auth: true
+			auth: false
 		}
 	];
 
 	$: currentPage = pages[pages.map((p) => p.route).indexOf($page.path)];
 
-	onMount(() => {
-		const storage = JSON.parse(localStorage.getItem('settings') ?? '{}') as Settings;
+	onMount(async () => {
+		if (!$authed) {
+			let auth;
+			await gql(
+				{
+					query: '{authed}'
+				},
+				(data) => {
+					auth = data.authed;
+					console.log(data);
+				}
+			);
+			authed.set(auth);
+		}
+
+		const storage = JSON.parse(localStorage.getItem('settings') ?? '{}');
 		settings.set(storage);
-		console.log('local storage', JSON.parse(localStorage.getItem('settings') ?? '{}') as Settings);
 
 		settings.subscribe((value) => {
 			settingsStore = value;
 			$dark =
 				settingsStore.dark ?? window.matchMedia('(prefers-color-scheme: dark)').matches ?? false;
 			localStorage.setItem('settings', JSON.stringify(settingsStore));
-			console.log(
-				'local storage',
-				JSON.parse(localStorage.getItem('settings') ?? '{}') as Settings
-			);
 		});
 
 		prefersDark.set(window.matchMedia('(prefers-color-scheme: dark)').matches);
-		console.log('prefers dark', window.matchMedia('(prefers-color-scheme: dark)').matches);
 		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
 			prefersDark.set(e.matches);
 			$dark = settingsStore.dark ?? e.matches ?? false;
 		});
-		console.log(
-			settingsStore.dark ?? window.matchMedia('(prefers-color-scheme: dark)').matches ?? false
-		);
+
+		if ($authed) {
+			await gql(
+				{
+					query: '{getUser{id}}'
+				},
+				(data) => user.set({ ...$user, ...data?.getUser })
+			);
+		}
 	});
 </script>
 
 <main class:dark={$dark}>
-	<div class="navigation-rail">
-		<div class="hamburger-container" class:hamburger-active={hamburger}>
-			{#if hamburger}
-				<button class="icon burger">
-					<Menu size="24" />
-				</button>
-			{/if}
-		</div>
-		<div class="fab-container" class:fab-active={currentPage?.fab}>
+	<!--	<div class="navigation-drawer container">-->
+	<!--		<p class="navigation-drawer headline">Appetized</p>-->
+	<!--		<nav class="navigation-drawer">-->
+	<!--			{#each pages.filter((page) => page.icon) as page}-->
+	<!--				{#if page.auth ?? auth === auth}<button-->
+	<!--						class:selected={currentPage?.route === page.route}-->
+	<!--						class="navigation-drawer"-->
+	<!--						on:hover={() => prefetch(page.route)}-->
+	<!--						on:click={() => goto(page.route)}-->
+	<!--					>-->
+	<!--						<span class="navigation-drawer icon">-->
+	<!--							<svelte:component this={page.icon} size="24" /></span-->
+	<!--						>-->
+	<!--						<small>{page.label}</small>-->
+	<!--					</button>-->
+	<!--				{/if}-->
+	<!--			{/each}-->
+	<!--		</nav>-->
+	<!--	</div>-->
+	<div class="navigation-rail container" in:fly={{ x: -100 }}>
+		<div class="navigation-rail fab container" class:displayed={currentPage?.fab}>
 			{#if currentPage?.fab}
-				<div in:fly={{ x: -50, duration: 100 }} out:fly={{ x: -50, duration: 10 }}>
+				<div
+					in:fly={{ x: -50, duration: 100 }}
+					out:fly={{ x: -50, duration: 10 }}
+					on:click={() => $fab()}
+				>
 					{#key currentPage?.fab}
-						<FloatingActionButton class="fab" label={currentPage?.label}>
+						<FloatingActionButton class="navigation-rail fab" label={currentPage?.label}>
 							<div in:fade>
 								<svelte:component this={currentPage?.fab} size="24" />
 							</div>
@@ -87,25 +153,40 @@
 				</div>
 			{/if}
 		</div>
-		<div class="nav-container">
-			<nav>
-				{#each pages.filter((page) => page.icon) as page}
-					<button
-						class="nav-item"
-						on:hover={() => prefetch(page.route)}
-						on:click={() => goto(page.route)}
-					>
-						<span class="nav icon" class:active={currentPage?.route === page.route}>
-							<svelte:component this={page.icon} size="24" /></span
-						>
-						<small>{page.label}</small>
-					</button>
-				{/each}
-			</nav>
+		<div class="navigation-rail item container">
+			{#key $authed}
+				<nav
+					class="navigation-rail"
+					in:fly={{ x: -50, duration: 75, delay: 150 }}
+					out:fly={{ x: -50, duration: 75 }}
+				>
+					{#each pages.filter((page) => page.icon) as page}
+						{#if page.auth === $authed || page.auth === null}
+							<button
+								class="navigation-rail item"
+								on:hover={() => prefetch(page.route)}
+								on:click={() => goto(page.route)}
+							>
+								<span
+									class="navigation-rail icon"
+									class:selected={currentPage?.route === page.route}
+								>
+									<svelte:component this={page.icon} size="24" /></span
+								>
+								<small>{page.label}</small>
+							</button>
+						{/if}
+					{/each}
+				</nav>
+			{/key}
 		</div>
 	</div>
-	{#key currentPage?.route}
-		<div class="container" in:fade={{ delay: 100 }}>
+	{#key path}
+		<div
+			class="page container"
+			in:fly={{ y: -15, duration: 50, delay: 50 }}
+			out:fly={{ y: 15, duration: 50 }}
+		>
 			<slot />
 		</div>
 	{/key}
@@ -251,6 +332,7 @@
 		small {
 			size: 12px;
 			text-transform: capitalize;
+			color: var(--on-surface-variant);
 		}
 
 		hr {
@@ -259,20 +341,32 @@
 			border: 0;
 			margin-bottom: 1rem;
 		}
+
+		a {
+			color: var(--primary);
+			text-decoration: none;
+		}
 	</style>
 </svelte:head>
 
 <style>
 	main {
 		background: var(--background);
-		min-height: 100%;
+		min-height: calc(100vh - 32px);
 		transition: background 0.3s ease;
 		display: flex;
 		padding: 16px;
 		gap: 16px;
+		height: auto;
 	}
 
-	.navigation-rail {
+	.page.container {
+		width: calc(100% - 128px);
+		position: absolute;
+		left: 112px;
+	}
+
+	.navigation-rail.container {
 		width: 80px;
 		display: flex;
 		flex-direction: column;
@@ -281,20 +375,21 @@
 		gap: 24px;
 	}
 
-	nav {
+	nav.navigation-rail {
+		position: absolute;
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
 	}
 
-	.nav-container {
+	.navigation-rail.item.container {
 		flex: 1 1 0;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 	}
 
-	.nav-item {
+	button.navigation-rail {
 		height: 56px;
 		width: 80px;
 		display: flex;
@@ -308,7 +403,7 @@
 		gap: 4px;
 	}
 
-	.icon {
+	.navigation-rail.icon {
 		width: 24px;
 		height: 24px;
 		padding: 4px;
@@ -317,99 +412,57 @@
 			background 100ms ease-in-out;
 	}
 
-	.nav.icon:hover {
+	.navigation-rail.icon:hover {
 		background: var(--secondary-container);
 	}
 
-	.burger {
-		display: flex;
-		width: 32px;
-		height: 32px;
-		color: var(--on-surface-variant);
-		border: 0;
-		background: transparent;
-	}
-
-	.burger.icon:hover {
-		background: var(--surface-variant);
-		cursor: pointer;
-	}
-
-	.nav.icon.active {
+	.navigation-rail.icon.selected {
 		background: var(--secondary-container);
 		width: 56px;
 		border-radius: 25%/50%;
 	}
 
-	.container {
-		width: 100%;
-	}
-
-	.hamburger-container {
-		height: 32px;
-		transition: height 50ms ease-in-out;
-	}
-
-	.hamburger-container:not(.hamburger-active) {
-		height: 0;
-	}
-
-	.fab-container {
+	.navigation-rail.fab.container {
 		height: 56px;
 		transition: height 50ms ease-in-out;
 	}
 
-	.fab-container:not(.fab-active) {
+	.navigation-rail.fab.container:not(.fab-active) {
 		height: 0;
 	}
 
-	@media (max-device-width: 600px) {
-		main {
-			flex-direction: column-reverse;
-			padding: 0;
-			height: 100vh;
-			gap: 0;
-		}
+	/*.navigation-drawer.container {*/
+	/*	display: flex;*/
+	/*	flex-direction: column;*/
+	/*	width: 360px;*/
+	/*	padding-right: 28px;*/
+	/*}*/
 
-		.container {
-			flex-grow: 1;
-			flex-shrink: 1;
-			width: calc(100vw - 1.5rem);
-			padding: 0.75rem;
-			overflow-x: visible;
-			overflow-y: scroll;
-		}
+	/*.navigation-drawer.headline {*/
+	/*	color: var(--on-surface-variant);*/
+	/*}*/
 
-		.nav-container {
-			align-items: center;
-			width: 100%;
-		}
+	/*nav.navigation-drawer {*/
+	/*	display: flex;*/
+	/*	flex-direction: column;*/
+	/*}*/
 
-		.nav-container > nav button {
-			flex: 1 1 0;
-		}
-
-		.navigation-rail {
-			position: relative;
-			bottom: 0;
-			margin: 0;
-			background: var(--surface);
-			box-shadow: var(--large-shadow);
-			width: 100vw;
-			flex: 0 1 auto;
-			height: min-content;
-			gap: 0;
-			padding-bottom: 16px;
-			padding-top: 12px;
-		}
-		.fab-container {
-			position: absolute;
-			bottom: 100px;
-			right: 16px;
-		}
-		nav {
-			flex-direction: row;
-			width: 100%;
-		}
-	}
+	/*button.navigation-drawer {*/
+	/*	height: 56px;*/
+	/*	width: 100%;*/
+	/*	display: flex;*/
+	/*	align-items: center;*/
+	/*	outline: none;*/
+	/*	background: transparent;*/
+	/*	border: none;*/
+	/*	color: var(--on-background);*/
+	/*	justify-content: start;*/
+	/*	gap: 16px;*/
+	/*	padding: 12px 12px 12px 16px;*/
+	/*	border-radius: 28px;*/
+	/*	transition: background 100ms ease-in-out;*/
+	/*}*/
+	/*button.navigation-drawer.selected {*/
+	/*	background: var(--secondary-container);*/
+	/*}*/
 </style>
