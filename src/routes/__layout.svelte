@@ -1,11 +1,3 @@
-<script context="module">
-	export const load = async ({ page }) => ({
-		props: {
-			path: page.path
-		}
-	});
-</script>
-
 <script>
 	import { onMount } from 'svelte';
 	import { dark, settings, prefersDark, authed, user, fab } from '../stores';
@@ -22,7 +14,7 @@
 	import { fade, fly } from 'svelte/transition';
 	import { gql } from '$lib/gql';
 
-	export let path;
+	$: console.log($page.path.split('-')[0]);
 
 	let settingsStore = null;
 
