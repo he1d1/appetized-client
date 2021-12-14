@@ -26,7 +26,7 @@
 >
 	<span
 		>{label}
-		{#if required}<span class="red">(required)</span>{/if}
+		{#if required}<span class="red">*</span>{/if}
 	</span><input
 		bind:this={input}
 		aria-labelledby={label.toLowerCase() + '-label'}
