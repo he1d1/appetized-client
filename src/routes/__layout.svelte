@@ -15,7 +15,6 @@
 	import Login from 'svelte-material-icons/Login.svelte';
 	import Saved from 'svelte-material-icons/Bookmark.svelte';
 	import Add from 'svelte-material-icons/Plus.svelte';
-	import Pencil from 'svelte-material-icons/Pencil.svelte';
 	import Cog from 'svelte-material-icons/Settings.svelte';
 	import FloatingActionButton from '../lib/FloatingActionButton.svelte';
 	import { page } from '$app/stores';
@@ -24,8 +23,6 @@
 	import { gql } from '$lib/gql';
 
 	export let path;
-
-	$: console.log(path);
 
 	let settingsStore = null;
 
@@ -181,7 +178,7 @@
 			{/key}
 		</div>
 	</div>
-	{#key path}
+	{#key $page.path}
 		<div
 			class="page container"
 			in:fly={{ y: -15, duration: 50, delay: 50 }}
@@ -352,7 +349,7 @@
 <style>
 	main {
 		background: var(--background);
-		min-height: calc(100vh - 32px);
+		min-height: calc(100vh - 2rem);
 		transition: background 0.3s ease;
 		display: flex;
 		padding: 16px;
@@ -376,7 +373,7 @@
 	}
 
 	nav.navigation-rail {
-		position: absolute;
+		position: fixed;
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
