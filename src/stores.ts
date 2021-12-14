@@ -26,7 +26,10 @@ export const user = writable({
 	username: undefined,
 	joinDate: undefined,
 	editDate: undefined,
-	profilePicture: undefined,
+	profilePicture: {
+		url: undefined,
+		alt: undefined
+	},
 	uploadedRecipes: undefined,
 	following: undefined,
 	followers: undefined,

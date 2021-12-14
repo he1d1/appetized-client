@@ -19,10 +19,9 @@
 			missing.push('username');
 		}
 
-		// TODO implement images
-		// if (typeof $user.profilePicture === 'undefined') {
-		// 	missing.push('profilePicture');
-		// }
+		if (typeof $user.profilePicture.url === 'undefined') {
+			missing.push('profilePicture{url, alt}');
+		}
 
 		if (!missing.length) return; // no missing fields
 
@@ -31,6 +30,7 @@
 				query: `{getUser{${JSON.stringify(missing).replace(/([["\]])/g, '')}}}`
 			},
 			(data) => {
+				console.log(data);
 				user.set({ ...$user, ...data?.getUser });
 				console.log($user);
 			}
@@ -40,7 +40,9 @@
 
 <Card outlined>
 	{#if $authed}
-		<div class="profile-pic">&nbsp;</div>
+		<div class="profile-pic">
+			&zwnj;<img src={$user?.profilePicture.url} alt={$user?.profilePicture.alt} />
+		</div>
 
 		{#if typeof $user.name === 'undefined'}
 			<Skelly />
@@ -115,6 +117,12 @@
 		height: 100px;
 		border-radius: 50%;
 		background-color: #eee;
+		overflow: hidden;
+	}
+	.profile-pic > img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
 	}
 
 	#theme {
