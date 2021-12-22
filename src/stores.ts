@@ -31,9 +31,10 @@ export const user = writable({
 		alt: undefined
 	},
 	uploadedRecipes: undefined,
-	following: undefined,
-	followers: undefined,
-	savedRecipes: undefined
+	following: [],
+	followers: [],
+	savedRecipes: [],
+	feed: []
 });
 export const fab = writable(function () {
 	console.log('fab');

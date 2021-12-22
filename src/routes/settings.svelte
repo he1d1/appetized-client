@@ -19,7 +19,7 @@
 			missing.push('username');
 		}
 
-		if (typeof $user.profilePicture.url === 'undefined') {
+		if (typeof $user?.profilePicture?.url === 'undefined') {
 			missing.push('profilePicture{url, alt}');
 		}
 
@@ -41,7 +41,7 @@
 <Card outlined>
 	{#if $authed}
 		<div class="profile-pic">
-			&zwnj;<img src={$user?.profilePicture.url} alt={$user?.profilePicture.alt} />
+			&zwnj;<img src={$user?.profilePicture?.url} alt={$user?.profilePicture?.alt} />
 		</div>
 
 		{#if typeof $user.name === 'undefined'}

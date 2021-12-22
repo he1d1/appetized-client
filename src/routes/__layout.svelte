@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
 	import { dark, settings, prefersDark, authed, user, fab } from '../stores';
 	import Home from 'svelte-material-icons/Home.svelte';
@@ -13,8 +13,7 @@
 	import { goto, prefetch } from '$app/navigation';
 	import { fade, fly } from 'svelte/transition';
 	import { gql } from '$lib/gql';
-
-	$: console.log($page.path.split('-')[0]);
+	import Toast from '$lib/Toast.svelte';
 
 	let settingsStore = null;
 
@@ -31,7 +30,7 @@
 			auth: true
 		},
 		{
-			route: '/profile',
+			route: '/@me',
 			icon: Profile,
 			label: 'Profile',
 			fab: myProfile ? Cog : null,
@@ -65,15 +64,23 @@
 	onMount(async () => {
 		if (!$authed) {
 			let auth;
-			await gql(
-				{
-					query: '{authed}'
-				},
-				(data) => {
-					auth = data.authed;
-					console.log(data);
-				}
-			);
+			const test = async (retrying) => {
+				toast.button.text = retrying ? 'Retrying...' : toast.button.text;
+				await gql(
+					{
+						query: '{authed}'
+					},
+					(data) => {
+						auth = data.authed;
+					}
+				).catch((err) => {
+					toast.text = err.message;
+					toast.button.text = 'Retry';
+					toast.button.fun = test;
+				});
+			};
+			await test(false);
+
 			authed.set(auth);
 		}
 
@@ -102,9 +109,23 @@
 			);
 		}
 	});
+
+	let toast = {
+		text: null,
+		button: {
+			text: null,
+			fun: null
+		}
+	};
 </script>
 
 <main class:dark={$dark}>
+	{#if toast.text}
+		<Toast error>
+			<p slot="text">{toast.text}</p>
+			<p slot="button" on:click={() => toast.button.fun()}>{toast.button.text}</p>
+		</Toast>
+	{/if}
 	<!--	<div class="navigation-drawer container">-->
 	<!--		<p class="navigation-drawer headline">Appetized</p>-->
 	<!--		<nav class="navigation-drawer">-->
@@ -287,35 +308,38 @@
 		h2,
 		h3,
 		h4,
-		h5 {
+		h5,
+		h6 {
+			color: var(--on-primary-container);
 			font-weight: bold;
 			line-height: 130%;
 			text-transform: capitalize;
 		}
 
 		h1 {
-			font-size: 49px;
-			letter-spacing: -0.05em;
+			font-size: 3rem;
+			margin: 0.67em 0;
 		}
 
 		h2 {
-			font-size: 39px;
-			letter-spacing: -0.025em;
+			color: var(--on-secondary-container);
+			font-size: 1.5rem;
+			margin: 0.83em 0;
 		}
 
 		h3 {
-			font-size: 31px;
-			letter-spacing: -0.0125em;
+			color: var(--on-tertiary-container);
+
+			font-size: 1.1em;
+			margin: 1em 0;
 		}
 
-		h4 {
-			font-size: 25px;
-			letter-spacing: -0.0063em;
-		}
-
-		h5 {
-			font-size: 20px;
-			letter-spacing: -0.0031em;
+		h4,
+		h5,
+		h6 {
+			color: var(--on-background);
+			font-size: 1rem;
+			margin: 1.6em 0 1em 0;
 		}
 
 		small {
@@ -350,9 +374,8 @@
 	}
 
 	.page.container {
-		width: calc(100% - 128px);
-		position: absolute;
-		left: 112px;
+		width: calc(100%);
+		position: relative;
 	}
 
 	.navigation-rail.container {

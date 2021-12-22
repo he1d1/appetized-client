@@ -34,7 +34,7 @@
 	});
 </script>
 
-<img src={$user.profilePicture.url} alt={$user.profilePicture.alt} />
+<img src={$user?.profilePicture?.url} alt={$user?.profilePicture?.alt} />
 
 <style>
 	img {

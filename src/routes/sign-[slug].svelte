@@ -7,6 +7,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { fly, fade } from 'svelte/transition';
+	import Toast from '$lib/Toast.svelte';
 
 	$: signIn = $page.params.slug === 'in';
 	$: signUp = $page.params.slug === 'up';
@@ -83,7 +84,8 @@
 		email: '',
 		password: '',
 		submit: () => {
-			if (!register.email?.length || !register.password?.length) return;
+			if (!register.email?.length || !register.password?.length || !register.username?.length)
+				return;
 			gql(
 				{
 					query: `
@@ -120,6 +122,7 @@
 	};
 
 	let error: string | null = null;
+	let toast = undefined;
 	$: console.log(error, $authed);
 </script>
 
