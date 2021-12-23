@@ -169,7 +169,6 @@
 	};
 </script>
 
-<svelte:head><title>Home - Appetized</title></svelte:head>
 <svelte:window bind:innerWidth={width} />
 
 <section>

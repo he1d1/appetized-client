@@ -117,7 +117,26 @@
 			fun: null
 		}
 	};
+
+	let width, height;
+
+	let aspectRatio;
+	$: aspectRatio = width / height;
+
+	function getPathWithoutSlugs(path) {
+		for (let param in $page.params) {
+			// eslint-disable-next-line no-prototype-builtins
+			if ($page.params.hasOwnProperty(param)) {
+				path = path.replace($page.params[param], `[${param}]`);
+			}
+		}
+		return path;
+	}
+
+	$: console.log(getPathWithoutSlugs($page.path));
 </script>
+
+<svelte:window bind:innerWidth={width} bind:innerHeight={height} />
 
 <main class:dark={$dark}>
 	{#if toast.text}
@@ -126,72 +145,92 @@
 			<p slot="button" on:click={() => toast.button.fun()}>{toast.button.text}</p>
 		</Toast>
 	{/if}
-	<!--	<div class="navigation-drawer container">-->
-	<!--		<p class="navigation-drawer headline">Appetized</p>-->
-	<!--		<nav class="navigation-drawer">-->
-	<!--			{#each pages.filter((page) => page.icon) as page}-->
-	<!--				{#if page.auth ?? auth === auth}<button-->
-	<!--						class:selected={currentPage?.route === page.route}-->
-	<!--						class="navigation-drawer"-->
-	<!--						on:hover={() => prefetch(page.route)}-->
-	<!--						on:click={() => goto(page.route)}-->
-	<!--					>-->
-	<!--						<span class="navigation-drawer icon">-->
-	<!--							<svelte:component this={page.icon} size="24" /></span-->
-	<!--						>-->
-	<!--						<small>{page.label}</small>-->
-	<!--					</button>-->
-	<!--				{/if}-->
-	<!--			{/each}-->
-	<!--		</nav>-->
-	<!--	</div>-->
-	<div class="navigation-rail container" in:fly={{ x: -100 }}>
-		<div class="navigation-rail fab container" class:displayed={currentPage?.fab}>
-			{#if currentPage?.fab}
-				<div
-					in:fly={{ x: -50, duration: 100 }}
-					out:fly={{ x: -50, duration: 10 }}
-					on:click={() => $fab()}
-				>
-					{#key currentPage?.fab}
-						<FloatingActionButton class="navigation-rail fab" label={currentPage?.label}>
-							<div in:fade>
-								<svelte:component this={currentPage?.fab} size="24" />
-							</div>
-						</FloatingActionButton>
-					{/key}
-				</div>
-			{/if}
-		</div>
-		<div class="navigation-rail item container">
-			{#key $authed}
-				<nav
-					class="navigation-rail"
-					in:fly={{ x: -50, duration: 75, delay: 150 }}
-					out:fly={{ x: -50, duration: 75 }}
-				>
-					{#each pages.filter((page) => page.icon) as page}
-						{#if page.auth === $authed || page.auth === null}
-							<button
-								class="navigation-rail item"
-								on:hover={() => prefetch(page.route)}
-								on:click={() => goto(page.route)}
+	{#if aspectRatio > 1.6 && width > 1600}
+		<div class="navigation-drawer container" in:fly={{ x: -100 }}>
+			<p class="navigation-drawer headline">Appetized</p>
+			<nav class="navigation-drawer">
+				{#each pages.filter((page) => page.icon) as page}
+					{#if page.auth === $authed || page.auth === null}
+						<button
+							class:selected={currentPage?.route === page.route}
+							class="navigation-drawer"
+							on:hover={() => prefetch(page.route)}
+							on:click={() => goto(page.route, { replaceState: false })}
+						>
+							<span class="navigation-drawer icon">
+								<svelte:component this={page.icon} size="24" /></span
 							>
-								<span
-									class="navigation-rail icon"
-									class:selected={currentPage?.route === page.route}
-								>
-									<svelte:component this={page.icon} size="24" /></span
-								>
-								<small>{page.label}</small>
-							</button>
-						{/if}
-					{/each}
-				</nav>
-			{/key}
+							<small>{page.label}</small>
+						</button>
+					{/if}
+				{/each}
+			</nav>
 		</div>
-	</div>
-	{#key $page.path}
+		{#if currentPage?.fab}
+			<div
+				class="navigation-drawer fab-container"
+				in:fly={{ x: -50, duration: 100 }}
+				out:fly={{ x: -50, duration: 10 }}
+				on:click={() => $fab()}
+			>
+				{#key currentPage?.fab}
+					<FloatingActionButton class="navigation-drawer fab" label={currentPage?.label}>
+						<div in:fade>
+							<svelte:component this={currentPage?.fab} size="24" />
+						</div>
+					</FloatingActionButton>
+				{/key}
+			</div>
+		{/if}
+	{:else}
+		<div class="navigation-rail container" in:fly={{ x: -100 }}>
+			<div class="navigation-rail fab container" class:displayed={currentPage?.fab}>
+				{#if currentPage?.fab}
+					<div
+						in:fly={{ x: -50, duration: 100 }}
+						out:fly={{ x: -50, duration: 10 }}
+						on:click={() => $fab()}
+					>
+						{#key currentPage?.fab}
+							<FloatingActionButton class="navigation-rail fab" label={currentPage?.label}>
+								<div in:fade>
+									<svelte:component this={currentPage?.fab} size="24" />
+								</div>
+							</FloatingActionButton>
+						{/key}
+					</div>
+				{/if}
+			</div>
+			<div class="navigation-rail item container">
+				{#key $authed}
+					<nav
+						class="navigation-rail"
+						in:fly={{ x: -50, duration: 75, delay: 150 }}
+						out:fly={{ x: -50, duration: 75 }}
+					>
+						{#each pages.filter((page) => page.icon) as page}
+							{#if page.auth === $authed || page.auth === null}
+								<button
+									class="navigation-rail item"
+									on:hover={() => prefetch(page.route)}
+									on:click={() => goto(page.route, { replaceState: false })}
+								>
+									<span
+										class="navigation-rail icon"
+										class:selected={currentPage?.route === page.route}
+									>
+										<svelte:component this={page.icon} size="24" /></span
+									>
+									<small>{page.label}</small>
+								</button>
+							{/if}
+						{/each}
+					</nav>
+				{/key}
+			</div>
+		</div>
+	{/if}
+	{#key getPathWithoutSlugs($page.path)}
 		<div
 			class="page container"
 			in:fly={{ y: -15, duration: 50, delay: 50 }}
@@ -203,6 +242,7 @@
 </main>
 
 <svelte:head>
+	<title>{currentPage?.label ? currentPage?.label + ' - Appetized' : 'Appetized'}</title>
 	<style>
 		@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&display=swap');
 
@@ -443,38 +483,46 @@
 		height: 0;
 	}
 
-	/*.navigation-drawer.container {*/
-	/*	display: flex;*/
-	/*	flex-direction: column;*/
-	/*	width: 360px;*/
-	/*	padding-right: 28px;*/
-	/*}*/
+	.navigation-drawer.container {
+		display: flex;
+		flex-direction: column;
+		width: 300px;
+		min-width: 300px;
+		padding-right: 28px;
+	}
 
-	/*.navigation-drawer.headline {*/
-	/*	color: var(--on-surface-variant);*/
-	/*}*/
+	.navigation-drawer.headline {
+		color: var(--on-surface-variant);
+	}
 
-	/*nav.navigation-drawer {*/
-	/*	display: flex;*/
-	/*	flex-direction: column;*/
-	/*}*/
+	nav.navigation-drawer {
+		display: flex;
+		flex-direction: column;
+	}
 
-	/*button.navigation-drawer {*/
-	/*	height: 56px;*/
-	/*	width: 100%;*/
-	/*	display: flex;*/
-	/*	align-items: center;*/
-	/*	outline: none;*/
-	/*	background: transparent;*/
-	/*	border: none;*/
-	/*	color: var(--on-background);*/
-	/*	justify-content: start;*/
-	/*	gap: 16px;*/
-	/*	padding: 12px 12px 12px 16px;*/
-	/*	border-radius: 28px;*/
-	/*	transition: background 100ms ease-in-out;*/
-	/*}*/
-	/*button.navigation-drawer.selected {*/
-	/*	background: var(--secondary-container);*/
-	/*}*/
+	button.navigation-drawer {
+		height: 56px;
+		width: 100%;
+		display: flex;
+		align-items: center;
+		outline: none;
+		background: transparent;
+		border: none;
+		color: var(--on-background);
+		justify-content: start;
+		gap: 16px;
+		padding: 12px 16px;
+		border-radius: 28px;
+		transition: background 100ms ease-in-out;
+	}
+	button.navigation-drawer.selected {
+		background: var(--secondary-container);
+	}
+
+	.navigation-drawer.fab-container {
+		bottom: 16px;
+		right: 16px;
+		position: fixed;
+		z-index: 2;
+	}
 </style>

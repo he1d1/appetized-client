@@ -175,7 +175,9 @@
 				</Button>
 				<div class="flex">
 					<p>
-						New to Appetized?&nbsp;<a sveltekit:prefetch href="/sign-up"
+						New to Appetized?&nbsp;<a
+							sveltekit:prefetch
+							on:click={() => goto('/sign-up', { replaceState: true })}
 							>Create&nbsp;an&nbsp;account</a
 						>
 					</p>
@@ -183,7 +185,8 @@
 							>{error?.message}&nbsp;
 							{#if error?.message === 'Incorrect email or password.'}<a
 									sveltekit:prefetch
-									href="/account-recovery">Forgot&nbsp;Password?</a
+									on:click={() => goto('/sign-up', { replaceState: true, noscroll: true })}
+									>Forgot&nbsp;Password?</a
 								>{/if}</span
 						>{/if}
 				</div>
