@@ -5,6 +5,8 @@
 	import '../lib/date.extensions';
 	import Outline from 'svelte-material-icons/BookmarkOutline.svelte';
 	import Filled from 'svelte-material-icons/Bookmark.svelte';
+	import Search from 'svelte-material-icons/Magnify.svelte';
+	import Input from '$lib/Input.svelte';
 
 	onMount(async () => {
 		await gql(
@@ -36,6 +38,7 @@
 					}
 				});
 				$user = $user;
+				console.log('Loaded Page', $user.feed);
 			}
 		);
 
@@ -166,34 +169,29 @@
 	};
 </script>
 
+<svelte:head><title>Home - Appetized</title></svelte:head>
 <svelte:window bind:innerWidth={width} />
 
 <section>
-	<h1>Home</h1>
+	<header>
+		<h1>Home</h1>
+		{#if width > 600}
+			<div class="input-container">
+				<Input placeholder="Search">
+					<div class="icon-container">
+						<Search size="24" />
+					</div>
+				</Input>
+			</div>{/if}
+	</header>
 	{#each $user?.feed as { id, name, description, uploadDate, image, gradient, author, username }, i}
-		<div
-			class:recipe={i !== 0 || width <= 900}
-			class:featured={i === 0 && width > 900}
-			class="container"
-		>
-			<div
-				class="image-container"
-				class:recipe={i !== 0 || width <= 900}
-				class:featured={i === 0 && width > 900}
-			>
+		<div class="container {i !== 0 || width <= 900 ? 'recipe' : 'featured'}">
+			<div class="image-container {i !== 0 || width <= 900 ? 'recipe' : 'featured'}">
 				<div class="image-placeholder" style={gradient}>&zwnj;</div>
 			</div>
-			<div
-				class="text-wrapper"
-				class:recipe={i !== 0 || width <= 900}
-				class:featured={i === 0 && width > 900}
-			>
-				<div
-					class="text-container"
-					class:recipe={i !== 0 || width <= 900}
-					class:featured={i === 0 && width > 900}
-				>
-					<h2 class:recipe={i !== 0 || width <= 900} class:featured={i === 0 && width > 900}>
+			<div class="text-wrapper {i !== 0 || width <= 900 ? 'recipe' : 'featured'}">
+				<div class="text-container {i !== 0 || width <= 900 ? 'recipe' : 'featured'}">
+					<h2 class={i !== 0 || width <= 900 ? 'recipe' : 'featured'}>
 						{name}
 					</h2>
 					<small>{description}</small>
@@ -233,6 +231,16 @@
 </section>
 
 <style>
+	header {
+		grid-column: span 3 / span 3;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	h1 {
+		flex: 1 1 0;
+	}
+
 	section {
 		gap: 2rem;
 		display: grid;
@@ -333,6 +341,17 @@
 		margin: 0;
 	}
 
+	.icon-container {
+		color: var(--on-surface);
+		opacity: 0.5;
+		height: 24px;
+		transition: opacity 200ms ease-in-out, color 200ms ease-in-out;
+	}
+
+	.input-container:focus-within .icon-container {
+		opacity: 1;
+		color: var(--primary);
+	}
 	.reached-bottom {
 		grid-column: span 3 / span 3;
 		justify-self: center;
@@ -344,11 +363,9 @@
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
 
-		.featured.container {
-			grid-column: span 2;
-		}
-
-		.reached-bottom {
+		.featured.container,
+		.reached-bottom,
+		header {
 			grid-column: span 2;
 		}
 
@@ -368,11 +385,9 @@
 			grid-template-columns: repeat(1, minmax(0, 1fr));
 		}
 
-		.featured.container {
-			grid-column: span 1;
-		}
-
-		.reached-bottom {
+		.featured.container,
+		.reached-bottom,
+		header {
 			grid-column: span 1;
 		}
 	}
@@ -380,6 +395,9 @@
 	@media only screen and (max-width: 600px) {
 		section {
 			padding: 0 1rem;
+		}
+		header {
+			align-items: center;
 		}
 	}
 </style>

@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import { dark, settings, prefersDark, authed, user, fab } from '../stores';
 	import Home from 'svelte-material-icons/Home.svelte';
-	import Search from 'svelte-material-icons/Magnify.svelte';
 	import Profile from 'svelte-material-icons/AccountCircle.svelte';
 	import Login from 'svelte-material-icons/Login.svelte';
 	import Saved from 'svelte-material-icons/Bookmark.svelte';
@@ -20,7 +19,7 @@
 	const myProfile = true;
 
 	const pages = [
-		{ route: '/', icon: Home, label: 'Home', fab: Search, auth: null },
+		{ route: '/', icon: Home, label: 'Home', fab: null, auth: null },
 		{ route: '/new', icon: Add, label: 'Create', fab: null, auth: true },
 		{
 			route: '/saved',
@@ -59,6 +58,7 @@
 		}
 	];
 
+	let currentPage;
 	$: currentPage = pages[pages.map((p) => p.route).indexOf($page.path)];
 
 	onMount(async () => {

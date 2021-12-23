@@ -27,19 +27,24 @@
 	<span
 		>{label}
 		{#if required}<span class="red">*</span>{/if}
-	</span><input
-		bind:this={input}
-		aria-labelledby={label.toLowerCase() + '-label'}
-		aria-required={required}
-		aria-invalid={(error ?? '').length > 0}
-		aria-errormessage={label.toLowerCase() + '-error'}
-		class:error={changed && error}
-		id={label.toLowerCase()}
-		bind:value
-		on:keypress
-		{...$$props}
-		{placeholder}
-	/>
+	</span>
+	<span class="container">
+		<slot />
+		<input
+			bind:this={input}
+			aria-labelledby={label.toLowerCase() + '-label'}
+			aria-required={required}
+			aria-invalid={(error ?? '').length > 0}
+			aria-errormessage={label.toLowerCase() + '-error'}
+			class:error={changed && error}
+			id={label.toLowerCase()}
+			bind:value
+			on:keypress
+			{...$$props}
+			{placeholder}
+		/>
+	</span>
+
 	{#if changed && error}<small
 			id={label.toLowerCase() + '-error'}
 			class="red"
@@ -52,23 +57,29 @@
 	* {
 		transition: color 200ms ease-in-out;
 	}
+	.container {
+		border: 1px solid var(--outline);
+		border-radius: 9999rem;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		transition: border 200ms ease-in-out;
+		padding-left: 1rem;
+	}
 	label {
 		display: flex;
 		margin-bottom: 0.5rem;
 		gap: 0.5rem;
 		flex-direction: column;
-		height: 97px;
 	}
 	label.inline {
 		flex-direction: row;
 	}
 	input {
-		transition: border 200ms ease-in-out;
-		border: 1px solid var(--outline);
 		background: transparent;
 		color: var(--on-surface);
-		padding: 0.75rem 0.75rem 0.75rem 1rem;
-		border-radius: 0.25rem;
+		padding: 0.75rem 0.75rem 0.75rem 0;
+		border: none;
 	}
 	.error {
 		color: var(--error);
@@ -81,6 +92,11 @@
 	}
 
 	input:focus {
+		outline: none;
+		border: none;
+	}
+	.container:focus,
+	.container:focus-within {
 		outline: none;
 		border: 1px solid var(--primary);
 	}
