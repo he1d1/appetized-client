@@ -28,15 +28,15 @@
 		>{label}
 		{#if required}<span class="red">*</span>{/if}
 	</span>
-	<span class="container">
+	<span class="container" class:error={changed && error}>
 		<slot />
 		<input
+			class:error={changed && error}
 			bind:this={input}
 			aria-labelledby={label.toLowerCase() + '-label'}
 			aria-required={required}
 			aria-invalid={(error ?? '').length > 0}
 			aria-errormessage={label.toLowerCase() + '-error'}
-			class:error={changed && error}
 			id={label.toLowerCase()}
 			bind:value
 			on:keypress
@@ -84,7 +84,7 @@
 	.error {
 		color: var(--error);
 	}
-	input.error {
+	.container.error {
 		border: 1px solid var(--error);
 	}
 	.red {
@@ -100,7 +100,7 @@
 		outline: none;
 		border: 1px solid var(--primary);
 	}
-	input:focus.error {
+	.container:focus.error {
 		border: 1px solid var(--error-container);
 	}
 </style>
