@@ -27,7 +27,7 @@
   },
   "type": "module",
   "dependencies": {
-    "node-sass": "^6.0.1",
+    "node-sass": "^7.0.0",
     "svelte-material-icons": "^1.0.3"
   }
 }
