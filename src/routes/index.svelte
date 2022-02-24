@@ -1,5 +1,12 @@
 <script context="module">
-    export async function load({session}) {
+    export async function load({session, fetch}) {
+        if (!session?.user) {
+            return {
+                status: 401,
+                error: "Login to access great features like the feed!"
+            }
+        }
+
         const response = await fetch('http://localhost:4000', {
             method: 'POST',
             credentials: 'include',
@@ -25,6 +32,7 @@
                         name
                         description
                         author {
+                          id
                           name
                           username
                           profilePicture {
@@ -41,7 +49,6 @@
         }).then((response) => response.json());
 
         if (response.errors) {
-            console.log(response.errors);
             return {
                 error: response.errors[0].message,
                 status: response.status
@@ -72,6 +79,7 @@
             buttons: []
         }
     })
+
 </script>
 
 {#if recipes?.length}
@@ -81,7 +89,7 @@
                 <Card neutral>
                     <h2>{recipe.name}</h2>
                     {#if recipe?.description}<p>{recipe.description}</p>{/if}
-                    <p>{recipe.author.name ?? "@" + recipe.author.username}</p>
+                    <a href={`/@${recipe.author.id}`} class="text-primary dark:text-primaryDark">{recipe.author.name ?? "@" + recipe.author.username}</a>
                 </Card>
             </a>
         {/each}

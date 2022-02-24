@@ -1,7 +1,7 @@
 <script>
     import Button from "$lib/Button.svelte";
     import Input from "$lib/Input.svelte";
-    import {goto} from "$app/navigation";
+    import {goto, invalidate} from "$app/navigation";
     import {authed, currentRoute} from "../store"
     import {onMount} from "svelte";
 
@@ -20,7 +20,7 @@
     <Input id="email" label="Email or Username" type="email" bind:value={email}/>
     <Input id="password" label="Password" type="password" bind:value={password}/>
     <Button primary on:click={async () => {
-        const res = await fetch("http://localhost:4000", {
+        await fetch("http://localhost:4000", {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -50,8 +50,10 @@
                 alert(res.data.loginUser.message);
             } else {
                 $authed = true;
+                invalidate("");
                 goto("/");
             }
         });
-    }}>Sign in</Button>
+       }}>Sign in
+    </Button>
 </div>

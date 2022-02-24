@@ -76,11 +76,8 @@
 <script lang="ts">
     import {page} from '$app/stores'
     import Card from "$lib/Card.svelte";
-    import {onMount} from "svelte";
-    import {currentRoute} from "../../store";
 
-    export let user, profile, promise
-    console.log(profile)
+    export let profile
     </script>
 
 <section class="mt-24">
@@ -89,8 +86,8 @@
             <div class="flex flex-col items-center mb-4">
                 <img
                         src={profile?.profilePicture?.url ?? "https://images.unsplash.com/photo-1622348512579-73da9531493a"}
-                        alt="Profile picture"
-                        class="rounded-full w-32 h-32 mx-auto object-cover -translate-y-2/3 absolute"/>
+                        alt="Profile"
+                        class="rounded-[3rem] w-32 h-32 mx-auto object-cover -translate-y-2/3 absolute"/>
                 <h1 class="mt-16">{profile.name ?? "@" + profile.username}</h1>
                 {#if profile.name}<h2>@{profile.username}</h2>{/if}
             </div>

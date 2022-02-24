@@ -13,6 +13,18 @@
                             recipe(id: $id) {
                                 ... on Recipe {
                                     name
+                                    description
+                                    createdAt
+                                    category
+                                    cuisine
+                                    ingredients {
+                                        name
+                                        quantity
+                                    }
+                                    steps {
+                                        name
+                                        content
+                                    }
                                 }
                                 ... on Error {
                                     code
@@ -28,13 +40,20 @@
             }
         );
         const json = await res.json();
+
+        if (json?.errors) {
+            return {
+                status: 500,
+                error: json.errors[0].message
+            }
+        }
         if (json.data.recipe?.code) {
             return {
                 error: json.data.recipe.message,
                 status: json.data.recipe.code
             }
         }
-        return { props: { recipe: json.data?.recipe } };
+        return {props: {recipe: json.data?.recipe}};
     }
 </script>
 
@@ -54,5 +73,8 @@
     })
 </script>
 
-{$page.params.id}
-{recipe?.name}
+{#if recipe?.description}
+    <p>
+        {recipe.description}
+    </p>
+{/if}
