@@ -25,6 +25,7 @@
     import Next from "svelte-material-icons/ArrowRight.svelte"
     import Back from "svelte-material-icons/ArrowLeft.svelte"
     import Party from "svelte-material-icons/PartyPopper.svelte"
+    import {goto} from "$app/navigation";
 
     onMount(() => {
         $currentRoute = {
@@ -35,9 +36,49 @@
     })
 
     export let user;
-    let name, description, ingredients, instructions, image, preview
+    let name, description, ingredients, instructions, image, preview, category, cuisine
 
     let step = 0;
+
+    async function createRecipe() {
+        return await fetch("http://localhost:4000",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    query: `
+                    mutation CreateRecipe ($name: String! $description: String $cuisine: String $category: String) {
+                      createRecipe(
+                        recipe: {
+                          name: $name
+                          description: $description
+                          cuisine: $cuisine
+                          category: $category
+                        }
+                      ) {
+                        ... on Recipe {
+                          name
+                          id
+                        }
+                        ... on Error {
+                          code
+                          message
+                        }
+                      }
+                    }
+                    `,
+                    variables: {
+                        name: name,
+                        description: description,
+                        cuisine: cuisine,
+                        category: category
+                    }
+                })
+            }).then(res => res.json()).then(res => goto(`recipe/${res.data.createRecipe.id}`))
+    }
 </script>
 
 <Card neutral>
@@ -55,10 +96,13 @@
         </div>
         {#if step === 0}
             <Input id="name" label="Recipe Name" type="text" bind:value={name} placeholder="My New Recipe"/>
-            <TextArea id="description" label="Description" placeholder="Describe your recipe..."/>
+            <TextArea id="description" label="Description" bind:value={description}
+                      placeholder="Describe your recipe..."/>
         {:else if step === 1}
-            <Input id="category" label="Category" type="text" placeholder="Breakfast, Lunch, Dinner..."/>
-            <Input id="cuisine" label="Cuisine" type="text" placeholder="Italian, Mexican, etc..."/>
+            <Input id="category" label="Category" type="text" bind:value={category}
+                   placeholder="Breakfast, Lunch, Dinner..."/>
+            <Input id="cuisine" label="Cuisine" type="text" bind:value={cuisine}
+                   placeholder="Italian, Mexican, etc..."/>
         {:else if step === 2}
             <Input id="image" label="Image" type="file" placeholder="Upload an image..." bind:value={image}/>
         {:else}
@@ -79,7 +123,7 @@
                         <span class="leading-none flex items-center justify-center gap-1">Next <Next size="16"/></span>
                     </Button>
                 {:else}
-                    <Button primary on:click={() => step++}>
+                    <Button primary on:click={() => {step++; createRecipe()}}>
                         <span class="leading-none flex items-center justify-center gap-1">Submit</span>
                     </Button>
                 {/if}
