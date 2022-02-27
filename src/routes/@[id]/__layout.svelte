@@ -80,16 +80,16 @@
     export let profile
     </script>
 
-<section class="mt-24">
+<section class="mt-20 mb-4">
     {#if profile}
         <Card neutral>
-            <div class="flex flex-col items-center mb-4">
+            <div class="flex flex-col items-center mb-4 relative">
                 <img
                         src={profile?.profilePicture?.url ?? "https://images.unsplash.com/photo-1622348512579-73da9531493a"}
                         alt="Profile"
-                        class="rounded-[3rem] w-32 h-32 mx-auto object-cover -translate-y-2/3 absolute"/>
+                        class="rounded-[3rem] w-32 h-32 mx-auto object-cover translate-y-[-65%] absolute"/>
                 <h1 class="mt-16">{profile.name ?? "@" + profile.username}</h1>
-                {#if profile.name}<h2>@{profile.username}</h2>{/if}
+                {#if profile.name}<p>@{profile.username}</p>{/if}
             </div>
             <div class="inline-flex select-none cursor-pointer gap-1 w-full bg overflow-x-scroll">
                 <a href={`/@${$page.params.id}`}
