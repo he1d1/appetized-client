@@ -8,6 +8,7 @@
 @layer base {
     * {
         font-family: 'Roboto Serif', sans-serif;
+        @apply transition-colors ease-in-out duration-200;
     }
     body {
         @apply bg-background dark:bg-backgroundDark;
