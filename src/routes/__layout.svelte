@@ -12,7 +12,7 @@
     import AccountCircle from "svelte-material-icons/AccountCircle.svelte"
     import Back from "svelte-material-icons/ArrowLeft.svelte"
     import {goto, prefetch} from "$app/navigation";
-    import {fly} from "svelte/transition";
+    import {fly, fade} from "svelte/transition";
     import IconButton from "$lib/IconButton.svelte";
     import {navigating} from "$app/stores";
     import {onMount} from "svelte";
@@ -59,6 +59,8 @@
         mounted = true;
     })
 
+    let navPage = null;
+
 </script>
 
 <svelte:head>
@@ -95,14 +97,16 @@
             </div>
             {#if previous.length > 1}<h1 class="pt-5 leading-none italic font-black">{$currentRoute?.name}</h1>{/if}
         </header>
-        <main in:fly={{ y: 50, duration: 150, delay: 150 }}
-              out:fly={{ y:-50, duration: 150 }}
+        {#key navPage}
+        <main in:fade={{ duration: 150, delay: 150 }}
+              out:fade={{ duration: 150 }}
               class="flex-1 overflow-scroll px-4 pb-4">
             <slot/>
         </main>
+            {/key}
         <nav class="flex gap-2 h-20 bg-surface dark:bg-surfaceDark relative after:absolute after:inset-0 after:content-[' '] after:bg-surfaceVariant dark:after:bg-surfaceVariantDark">
             {#each routes as route, i}
-                <button on:click={() => {if (route.route !== url.pathname) goto(route.route)}} on:mouseover|once={() => {if (route.route !== url.pathname) prefetch(route.route)}} class={`overflow-hidden transition-opacity block z-10 cursor-pointer text-onSurfaceVariant dark:text-onSurfaceVariantDark flex flex-col items-center justify-center gap-1 w-full pt-3 pb-4 relative after:absolute after:inset-0 after:bg-surfaceVariant after:dark:bg-surfaceVariantDark after:opacity-0 after:hover:opacity-[8%] after:focus-visible:opacity-[12%] after:active:opacity-[12%] focus:outline-0 focus:outline-none focus:border-0 ${url.pathname === route.route && "after:bg-surface after:dark:bg-surfaceDark"}`}>
+                <button on:click={() => {if (route.route !== url.pathname) { goto(route.route); navPage = route.route}}} on:mouseenter|once={() => {if (route.route !== url.pathname) prefetch(route.route)}} class={`overflow-hidden transition-opacity block z-10 cursor-pointer text-onSurfaceVariant dark:text-onSurfaceVariantDark flex flex-col items-center justify-center gap-1 w-full pt-3 pb-4 relative after:absolute after:inset-0 after:bg-surfaceVariant after:dark:bg-surfaceVariantDark after:opacity-0 after:hover:opacity-[8%] after:focus-visible:opacity-[12%] after:active:opacity-[12%] focus:outline-0 focus:outline-none focus:border-0 ${url.pathname === route.route && "after:bg-surface after:dark:bg-surfaceDark"}`}>
                     <span class={`p-1 bg-opacity-0 transition-all rounded-[1rem] ${(url.pathname.substring(0, url.pathname.indexOf("/", 2)) === route.route || url.pathname === route.route) && "bg-secondaryContainer dark:bg-secondaryContainerDark text-onSecondaryContainer dark:text-onSecondaryContainerDark px-5 bg-opacity-100"}`}>
                         <i class="w-6 h-6 relative">
                             <svelte:component this={route.icon} size="24"/>
