@@ -154,7 +154,7 @@
 
     let elements = [];
 
-    $: observer?.observe(elements[elements.length - 3])
+    $: elements?.length && observer?.observe(elements[elements.length - 3])
     $: console.log(elements)
 
 </script>
@@ -171,7 +171,16 @@
                 </Card>
             </a>
         {/each}
+        <div><h1 class="text-center">That's all</h1>
+            <p class="text-center">
+                Follow more people to see more recipes.
+            </p></div>
     </div>
+{:else}
+    <h1 class="text-center">
+        Nothing to see here
+    </h1>
+    <p class="text-center">Start following people to have them show up in the feed.</p>
 {/if}
 
 <style>

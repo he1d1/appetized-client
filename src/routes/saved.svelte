@@ -74,8 +74,8 @@
 
     onMount(() => {
         $currentRoute = {
-            name: 'Home',
-            route: '/',
+            name: 'Saved',
+            route: '/Saved',
             buttons: []
         }
     })

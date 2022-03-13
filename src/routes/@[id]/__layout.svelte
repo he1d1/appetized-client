@@ -76,8 +76,28 @@
 <script lang="ts">
     import {page} from '$app/stores'
     import Card from "$lib/Card.svelte";
+    import {onMount} from "svelte";
+    import {currentRoute} from "../../store";
+    import Settings from "svelte-material-icons/Settings.svelte"
+    import {goto} from "$app/navigation";
 
     export let profile
+
+    onMount(() => {
+        currentRoute.update(route => {
+            return {
+                ...route,
+                buttons: $page.params.id === "me" ? [
+                    {
+                        component: Settings,
+                        click: () => {
+                            goto(`/settings`)
+                        }
+                    }
+                ] : []
+            }
+        })
+    })
     </script>
 
 <section class="mt-20 mb-4">

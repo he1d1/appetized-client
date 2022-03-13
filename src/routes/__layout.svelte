@@ -16,8 +16,9 @@
     import IconButton from "$lib/IconButton.svelte";
     import {navigating} from "$app/stores";
     import {onMount} from "svelte";
-    import {currentRoute} from "../store";
+    import {currentRoute, modal} from "../store";
     import Logo from "$lib/Logo.svelte";
+    import Button from "$lib/Button.svelte";
 
     export let url;
 
@@ -60,16 +61,36 @@
     })
 
     let navPage = null;
-
 </script>
 
 <svelte:head>
-    {#if $currentRoute?.name}
-        {#key $currentRoute}
-            <title>{$currentRoute.name}</title>
-        {/key}
-    {/if}
+    <title>{$currentRoute?.name ?? "Appetized"}</title>
 </svelte:head>
+
+{#if $modal}
+    <div id="modal" transition:fade={{duration: 100}} class:danger={$modal?.danger} class="absolute inset-0 z-40" on:click={() => $modal = $modal?.closable ? undefined : $modal}>
+        <div class="flex items-center justify-center h-full">
+            <div class="bg-surface dark:bg-surfaceDark p-4 m-4 rounded-lg text-onSurface dark:text-onSurfaceDark flex flex-col gap-2">
+                <h1>{$modal?.title}</h1>
+                <p>{$modal?.content}</p>
+                <hr>
+                <div class="flex justify-end">
+                    {#each $modal?.actions as action}
+                        <Button
+                            primary={action?.buttonType === "primary"}
+                            secondary={action?.buttonType === "secondary"}
+                            text={action?.buttonType === "text"}
+                            danger={action?.buttonType === "danger"}
+                            on:click={action?.click}
+                        >
+                            {action?.label}
+                        </Button>
+                    {/each}
+                </div>
+            </div>
+        </div>
+    </div>
+{/if}
 
 {#if mounted}
     <div class="h-screen flex flex-col w-screen overflow-hidden">
@@ -123,8 +144,14 @@
     </main>
 {/if}
 
-<style>
+<style lang="postcss">
     nav:after {
         --tw-bg-opacity: 10%;
+    }
+    #modal.danger {
+        @apply bg-error/25 dark:bg-errorDark/25
+    }
+    #modal:not(.danger) {
+        @apply bg-primary/25 dark:bg-primaryDark/25
     }
 </style>

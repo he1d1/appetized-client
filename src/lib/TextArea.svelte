@@ -16,13 +16,7 @@
     {label}
     <div class="bg-surface dark:bg-surfaceDark w-full overflow-hidden rounded-lg">
         <slot name="before"></slot>
-        <textarea class="w-full h-full" {id} bind:value rows="4" {placeholder}></textarea>
+        <textarea class="w-full h-full bg-transparent p-2 px-3 border-[1px] border-outline dark:border-outlineDark rounded-lg" {id} bind:value rows="4" {placeholder}></textarea>
         <slot name="after"></slot>
     </div>
 </label>
-
-<style lang="postcss">
-    textarea {
-        @apply bg-transparent p-2 px-3 border-[1px] border-outline dark:border-outlineDark rounded-lg;
-    }
-</style>

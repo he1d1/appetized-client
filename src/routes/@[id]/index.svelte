@@ -75,7 +75,7 @@
         $currentRoute = {
             name: 'Recipes',
             route: '/@[id]/',
-            buttons: []
+            buttons: $currentRoute?.buttons
         }
     })
 

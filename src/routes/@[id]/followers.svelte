@@ -72,18 +72,17 @@
         $currentRoute = {
             name: 'Followers',
             route: '/@[id]/followers',
-            buttons: []
+            buttons: $currentRoute?.buttons
         }
     })
 
 </script>
 
 {#if users?.length}
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4 divide-y-[1px] divide-outline dark:divide-outlineDark">
         {#each users as user}
         <a on:mouseenter|once={() => prefetch(`/@${user.id}}`)} href={`/@${user.id}`}>
-                <Card neutral>
-                    <h2>{user.name ?? "@" + user.username}</h2></Card>
+                    <h2>{user.name ?? "@" + user.username}</h2>
             </a>
         {/each}
     </div>

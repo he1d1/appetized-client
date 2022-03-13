@@ -6,7 +6,7 @@
         $currentRoute = {
             name: 'Saved',
             route: '/@[id]/saved',
-            buttons: []
+            buttons: $currentRoute?.buttons
         }
     })
 </script>

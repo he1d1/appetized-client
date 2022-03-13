@@ -1,6 +1,6 @@
 <script context="module">
     export async function load({session}) {
-        if (!session.user.id) {
+        if (!session?.user) {
             return {
                 error: "You are not logged in. Sign in below to post recipes.",
                 status: 401
@@ -33,10 +33,12 @@
             buttons: [],
             route: "/create"
         }
+
+        reader = new FileReader();
     })
 
     export let user;
-    let name, description, ingredients, instructions, image, preview, category, cuisine
+    let name, description, base64, reader, category, cuisine
 
     let step = 0;
 
@@ -50,13 +52,16 @@
                 credentials: "include",
                 body: JSON.stringify({
                     query: `
-                    mutation CreateRecipe ($name: String! $description: String $cuisine: String $category: String) {
+                    mutation CreateRecipe ($name: String! $description: String $cuisine: String $category: String $base64: String!) {
                       createRecipe(
                         recipe: {
                           name: $name
                           description: $description
                           cuisine: $cuisine
                           category: $category
+                        },
+                        image: {
+                          base64: $base64
                         }
                       ) {
                         ... on Recipe {
@@ -71,14 +76,17 @@
                     }
                     `,
                     variables: {
-                        name: name,
-                        description: description,
-                        cuisine: cuisine,
-                        category: category
+                        name,
+                        description,
+                        cuisine,
+                        category,
+                        base64
                     }
                 })
             }).then(res => res.json()).then(res => goto(`recipe/${res.data.createRecipe.id}`))
     }
+
+    let imageValue;
 </script>
 
 <Card neutral>
@@ -95,7 +103,7 @@
             {#if step !== 3}<p>Step <sup>{step + 1}</sup>/<sub>3</sub></p>{/if}
         </div>
         {#if step === 0}
-            <Input id="name" label="Recipe Name" type="text" bind:value={name} placeholder="My New Recipe"/>
+            <Input required id="name" label="Recipe Name" type="text" bind:value={name} placeholder="My New Recipe"/>
             <TextArea id="description" label="Description" bind:value={description}
                       placeholder="Describe your recipe..."/>
         {:else if step === 1}
@@ -104,7 +112,17 @@
             <Input id="cuisine" label="Cuisine" type="text" bind:value={cuisine}
                    placeholder="Italian, Mexican, etc..."/>
         {:else if step === 2}
-            <Input id="image" label="Image" type="file" placeholder="Upload an image..." bind:value={image}/>
+            <div class="w-full aspect-square bg-background dark:bg-backgroundDark border-[1px] border-outline dark:border-outlineDark overflow-hidden text-onBackground dark:text-onBackgroundDark flex items-center justify-center rounded-xl">
+                {#if base64}<img alt="Preview" class="object-cover w-full h-full" src={base64}/>{:else}Preview{/if}
+            </div>
+            <a class="ml-auto" on:click={() => {imageValue = null; base64 = null}}>Remove</a>
+            <Input id="image" label="Image" type="file" placeholder="Upload an image..." accept=".png, .jpg, .jpeg" bind:value={imageValue} on:change={(e) => {
+               let image = e.target.files[0];
+               reader.readAsDataURL(image);
+               reader.onload = (e) => {
+                   base64 = e.target.result;
+               };
+            }}/>
         {:else}
             <div class="flex flex-col items-center justify-center gap-2">
                 <Party size="32"/>

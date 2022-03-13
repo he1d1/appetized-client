@@ -17,6 +17,17 @@
                                     createdAt
                                     category
                                     cuisine
+                                    image {
+                                        url
+                                    }
+                                    author {
+                                        id
+                                        name
+                                        username
+                                        profilePicture {
+                                            url
+                                        }
+                                    }
                                     ingredients {
                                         name
                                         quantity
@@ -61,6 +72,7 @@
     import {page} from "$app/stores";
     import {onMount} from "svelte";
     import {currentRoute} from "../../store";
+    import User from "$lib/User.svelte";
 
     export let recipe;
 
@@ -73,8 +85,16 @@
     })
 </script>
 
-{#if recipe?.description}
-    <p>
-        {recipe.description}
-    </p>
-{/if}
+<article class="flex flex-col gap-4">
+    {#if recipe?.image?.url}
+        <img class="rounded-lg my-2 max-h-[50vh] object-cover" src={recipe.image.url} alt={recipe.name}/>
+    {/if}
+
+    <User user={recipe?.author}/>
+
+    {#if recipe?.description}
+        <p>
+            {recipe.description}
+        </p>
+    {/if}
+</article>
