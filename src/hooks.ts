@@ -1,6 +1,5 @@
-import type { MaybePromise } from '@sveltejs/kit/types/helper';
-import type { RequestEvent } from '@sveltejs/kit';
 import { authed as authedStore, connected as connectedStore } from './store';
+import type { RequestEvent } from '@sveltejs/kit/types/private';
 
 export async function getSession(event: RequestEvent) {
 	// If the user does not have a refresh token it is not possible for them to be authenticated

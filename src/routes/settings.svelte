@@ -26,33 +26,23 @@
     import Pencil from "svelte-material-icons/Pencil.svelte"
     import Button from "$lib/Button.svelte";
     import {goto} from "$app/navigation";
+    import {session} from "$app/stores";
 
     export let profile;
 
-    let ImageComponent = 0;
-    onMount(() => {
-        $currentRoute = {
-            name: "Settings",
-            buttons: [],
-            route: "/settings"
-        }
-        ImageComponent = new Image({
-            target: document.querySelector('#modal-component'),
-    })})
+    let base64, bindComponent;
 
-    let base64
+    $: bindComponent = $modal?.bindComponent
+    $: base64 = bindComponent?.base64
 
-    $: console.log
-
-    $: console.log(ImageComponent.base64)
-
-    $: base64 = Image.base64
-    $: console.log(Image)
+    $: if ($modal?.actions) {
+        if ($modal.actions.find(i => i.label === "Save")) $modal.actions.find(i => i.label === "Save").disabled = !base64
+    }
 
     function profilePictureModal() {
         $modal = {
             title: 'Edit Profile Picture',
-            component: ImageComponent,
+            component: Image,
             actions: [
                 {
                     label: 'Cancel',
@@ -63,6 +53,7 @@
                 },
                 {
                     label: 'Save',
+                    disabled: base64 !== undefined,
                     buttonType: 'primary',
                     click: async () => {
                         await fetch("http://localhost:4000",
@@ -74,26 +65,30 @@
                                 credentials: "include",
                                 body: JSON.stringify({
                                     query: `
-                    mutation EditUser ($base64: String!) {
-                        editUser(image: {base64: $base64}) {
-                            ... on User {
-                                id
-                                profilePicture {
-                                    url
-                                }
-                            }
-                            ... on Error {
-                                code
-                                message
-                            }
-                        }
-                    }
-                    `,
+                                        mutation EditUser($base64: String!) {
+                                            editUser(image: {base64: $base64}) {
+                                                ... on User {
+                                                    id
+                                                    profilePicture {
+                                                        url
+                                                    }
+                                                }
+                                                ... on Error {
+                                                    code
+                                                    message
+                                                }
+                                            }
+                                        }
+                                    `,
                                     variables: {
-                                        base64
+                                        base64: base64
                                     }
                                 })
-                            }).then(res => res.json()).then(() => $modal = undefined)
+                            }).then(
+                                res => res.json()
+                        ).then(
+                            () => $modal = undefined
+                        )
                     }
                 }
             ]
@@ -106,7 +101,38 @@
             content: 'This will delete your account and all your recipes.',
             closable: false,
             danger: true,
-            actions: [],
+            actions: [
+                {
+                    label: 'Cancel',
+                    click: async () => {
+                        $modal = undefined
+                    },
+                    buttonType: 'text'
+                },
+                {
+                    label: 'Delete',
+                    click: async () => {
+                        await fetch("https://localhost:4000",
+                            {
+                                method: "POST",
+                                credentials: "include",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({
+                                    query: `
+                                        mutation {
+                                            deleteUser
+                                        }
+                                    `
+                                })
+                            }
+                        )
+                        $modal = undefined
+                    },
+                    buttonType: 'danger'
+                }
+            ]
         }
     }
 </script>

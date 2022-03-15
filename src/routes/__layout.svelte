@@ -73,9 +73,7 @@
             <div class="bg-surface dark:bg-surfaceDark p-4 m-4 rounded-lg text-onSurface dark:text-onSurfaceDark flex flex-col gap-2">
                 <h1>{$modal?.title}</h1>
                 <p>{$modal?.content}</p>
-                <div id="modal-component">
-                    <svelte:component this={$modal?.component}/>
-                </div>
+                <svelte:component id="modal-component" this={$modal?.component} bind:this={$modal.bindComponent}/>
                 <hr>
                 <div class="flex justify-end">
                     {#each $modal?.actions as action}
@@ -84,6 +82,7 @@
                             secondary={action?.buttonType === "secondary"}
                             text={action?.buttonType === "text"}
                             danger={action?.buttonType === "danger"}
+                            disabled={action?.disabled}
                             on:click={action?.click}
                         >
                             {action?.label}

@@ -6,9 +6,16 @@
     export let disabled = false;
 </script>
 
+{#if !disabled}
 <button class:primary class:secondary class:text class:disabled class:danger on:click on:hover>
     <slot></slot>
 </button>
+    {:else}
+<button class:primary class:secondary class:text class:disabled class:danger>
+    <slot></slot>
+</button>
+{/if}
+
 
 <style lang="postcss">
     button {

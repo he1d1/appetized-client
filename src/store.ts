@@ -12,7 +12,8 @@ export const modal: Writable<{
 	closable: boolean;
 	title: string;
 	danger: boolean;
-	actions: { buttonType: string; label: string; click: () => Promise<void> }[];
+	actions: { buttonType: string; disabled?: boolean; label: string; click: () => Promise<void> }[];
 	content?: string;
 	component?: SvelteComponent;
+	bindComponent?: any;
 }> = writable(undefined);
