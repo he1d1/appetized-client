@@ -4,7 +4,7 @@
     import {goto} from "$app/navigation";
     import {authed, currentRoute} from "../store"
     import {onMount} from "svelte";
-    import { session } from "$app/stores";
+    import {session} from "$app/stores";
 
     let email, password;
 
@@ -59,7 +59,8 @@
                 alert(res.data.loginUser.message);
             } else {
                 $authed = true;
-                $session = res.data.loginUser;
+                console.log(res.data.loginUser);
+                $session.user = res.data.loginUser;
                 goto("/");
             }
         });

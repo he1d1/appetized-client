@@ -15,7 +15,7 @@
     import {goto, prefetch} from "$app/navigation";
     import {authed, currentRoute} from "../store";
     import {onMount} from "svelte";
-    import {page} from "$app/stores";
+    import {page, session} from "$app/stores";
 
     export let status, message;
 
@@ -48,7 +48,7 @@
     <p class="text-center">
         {message}
     </p>
-    {#if status === 401 && !$authed}
+    {#if status === 401 && !$session?.user}
         <div class="flex gap-4">
             <Button on:click={() => goto("/sign-in")} on:hover|once={() => prefetch("/sign-in")} secondary>
                 Sign In

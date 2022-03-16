@@ -35,6 +35,9 @@
                                     steps {
                                         name
                                         content
+                                        image {
+                                            url
+                                        }
                                     }
                                 }
                                 ... on Error {
@@ -73,6 +76,7 @@
     import {onMount} from "svelte";
     import {currentRoute} from "../../store";
     import User from "$lib/User.svelte";
+    import Card from "$lib/Card.svelte";
 
     export let recipe;
 
@@ -83,6 +87,8 @@
             buttons: []
         });
     })
+
+    $: console.log(recipe)
 </script>
 
 <article class="flex flex-col gap-4">
@@ -97,4 +103,23 @@
             {recipe.description}
         </p>
     {/if}
+
+    <h2>Ingredients</h2>
+
+    <ul>
+    {#each recipe?.ingredients as ingredient}
+        <li class="flex items-center before:content-['•'] ml-2 before:-ml-2 before:mr-2">
+            {ingredient.quantity} of {ingredient.name}
+        </li>
+    {/each}
+    </ul>
+
+    <h2>Steps</h2>
+
+    {#each recipe?.steps as step, i}
+            <Card neutral>
+                <h3>{i+1}. {step?.name}</h3>
+                <p>{step.content}</p>
+            </Card>
+    {/each}
 </article>

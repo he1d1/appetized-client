@@ -70,11 +70,13 @@
 {#if $modal}
     <div id="modal" transition:fade={{duration: 100}} class:danger={$modal?.danger} class="absolute inset-0 z-40" on:click={() => $modal = $modal?.closable ? undefined : $modal}>
         <div class="flex items-center justify-center h-full">
-            <div class="bg-surface dark:bg-surfaceDark p-4 m-4 rounded-lg text-onSurface dark:text-onSurfaceDark flex flex-col gap-2">
+            <div class="bg-surface dark:bg-surfaceDark p-4 m-4 rounded-lg text-onSurface dark:text-onSurfaceDark flex flex-col gap-2 w-full">
                 <h1>{$modal?.title}</h1>
                 <p>{$modal?.content}</p>
+                {#if $modal.component}
                 <svelte:component id="modal-component" this={$modal?.component} bind:this={$modal.bindComponent}/>
-                <hr>
+                    {/if}
+                    <hr>
                 <div class="flex justify-end">
                     {#each $modal?.actions as action}
                         <Button

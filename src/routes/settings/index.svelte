@@ -21,27 +21,41 @@
     import Card from "$lib/Card.svelte"
     import Image from "$lib/Image.svelte"
     import {onMount} from "svelte";
-    import {currentRoute, modal} from "../store";
+    import {currentRoute, modal} from "../../store";
     import IconButton from "$lib/IconButton.svelte";
     import Pencil from "svelte-material-icons/Pencil.svelte"
     import Button from "$lib/Button.svelte";
     import {goto} from "$app/navigation";
     import {session} from "$app/stores";
+    import _EditProfile from "./_EditProfile.svelte";
 
     export let profile;
 
-    let base64, bindComponent;
+    let base64;
 
-    $: bindComponent = $modal?.bindComponent
-    $: base64 = bindComponent?.base64
+    $: base64 = $modal?.bindComponent?.base64
+    $: name = $modal?.bindComponent?.name
+    $: username = $modal?.bindComponent?.username
+
+    $: console.log(base64, name, username)
+
+    $: console.log($session)
 
     $: if ($modal?.actions) {
         if ($modal.actions.find(i => i.label === "Save")) $modal.actions.find(i => i.label === "Save").disabled = !base64
     }
 
+    onMount(() => {
+        $currentRoute = {
+            name: "Settings",
+            route: "/settings",
+        }
+    })
+
     function profilePictureModal() {
         $modal = {
             title: 'Edit Profile Picture',
+            content: 'Change up your look',
             component: Image,
             actions: [
                 {
@@ -87,6 +101,66 @@
                             }).then(
                                 res => res.json()
                         ).then(
+                            async () => $modal = undefined
+                        )
+                    }
+                }
+            ]
+        }
+    }
+
+    function profileModal() {
+        $modal = {
+            title: 'Edit Profile',
+            content: "Change your name or username",
+            component: _EditProfile,
+            actions: [
+                {
+                    label: 'Cancel',
+                    buttonType: 'secondary',
+                    click: async () => {
+                        $modal = undefined
+                    }
+                },
+                {
+                    label: 'Update',
+                    buttonType: 'primary',
+                    click: async () => {
+                        await fetch("http://localhost:4000",
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                credentials: "include",
+                                body: JSON.stringify({
+                                    query: `
+                                        mutation EditUser($user: EditUserInput) {
+                                            editUser(user: $user) {
+                                                ... on User {
+                                                    id
+                                                    name
+                                                    username
+                                                }
+                                                ... on Error {
+                                                    code
+                                                    message
+                                                }
+                                            }
+                                        }
+                                    `,
+                                    variables: {
+                                        user: {
+                                            name,
+                                            username
+                                        }
+                                    }
+                                })
+                        }).then(
+                            res => res.json()
+                        ).then(
+                            res => $session.user = {...$session.user, ...res.data.editUser}
+                        ).then(
                             () => $modal = undefined
                         )
                     }
@@ -112,7 +186,7 @@
                 {
                     label: 'Delete',
                     click: async () => {
-                        await fetch("https://localhost:4000",
+                        await fetch("http://localhost:4000",
                             {
                                 method: "POST",
                                 credentials: "include",
@@ -135,10 +209,32 @@
             ]
         }
     }
+
+    async function signOut() {
+        await fetch("http://localhost:4000",
+            {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    query: `
+                        mutation {
+                            logoutUser
+                        }
+                    `
+                })
+            }
+        )
+
+        $session.user = undefined
+    }
 </script>
 
 <div class="flex flex-col gap-4">
     <Card neutral>
+    {#if $session?.user}
         <div class="flex flex-col gap-4">
             <div class="flex">
                 <div class="relative w-20 h-20"><img
@@ -157,15 +253,34 @@
                     <p>@{profile?.name ? profile.username : ""}</p>
                 </div>
             </div>
-            <Button secondary>Edit Profile</Button>
+            <Button secondary on:click={() => profileModal()}>Edit Profile</Button>
         </div>
+    {:else}
+
+        <div class="flex flex-col gap-2"><h1>Sign In</h1>
+            <Button primary on:click={() => goto("/sign-up")}>Sign up</Button>
+            <Button secondary on:click={() => goto("/sign-in")}>Log in</Button>
+        </div>
+    {/if}
     </Card>
 
+
+    {#if $session?.user}
+    <Card neutral>
+        <div class="flex flex-col gap-2">
+            <h1>Sign Out</h1>
+            <Button secondary on:click={() => signOut()}>Sign Out</Button>
+        </div>
+    </Card>
+    {/if}
+
+    {#if $session?.user}
     <Card neutral>
         <div class="flex flex-col gap-2"><h1>Danger Zone</h1>
             <p>This is a dangerous area. You can delete your account and all of your recipes.</p>
             <Button danger on:click={() => deleteModal()}>Delete Account</Button>
         </div>
     </Card>
+    {/if}
 </div>
 
