@@ -6,7 +6,11 @@ export const connected: Writable<boolean | null> = writable(null);
 export const currentRoute: Writable<{
 	name?: string;
 	route: string;
-	buttons: SvelteComponent[];
+	buttons: {
+		component?: SvelteComponent;
+		click?: () => void;
+		noIconButton?: boolean;
+	}[];
 } | null> = writable(null);
 export const modal: Writable<{
 	closable: boolean;
@@ -15,5 +19,5 @@ export const modal: Writable<{
 	actions: { buttonType: string; disabled?: boolean; label: string; click: () => Promise<void> }[];
 	content?: string;
 	component?: SvelteComponent;
-	bindComponent?: any;
 }> = writable(undefined);
+export const bindComponent: Writable<SvelteComponent | null> = writable(null);

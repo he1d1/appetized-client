@@ -45,6 +45,9 @@ export async function getSession(event: RequestEvent) {
 				        recipesCount
 				        followerCount
 				        followingCount
+						savedRecipes {
+						id
+					}
 					}
 					... on Error {
 					  code 

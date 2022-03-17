@@ -34,6 +34,9 @@
                         id
                         name
                         description
+                        createdAt
+                        cuisine
+                        category
                         author {
                           id
                           name
@@ -117,6 +120,9 @@
                         id
                         name
                         description
+                        createdAt
+                        cuisine
+                        category
                         author {
                           id
                           name
@@ -154,7 +160,7 @@
 
     let elements = [];
 
-    $: elements?.length && observer?.observe(elements[elements.length - 3])
+    $: if (elements.length > 2) observer?.observe(elements[elements.length - 3])
     $: console.log(elements)
 
 </script>
@@ -166,12 +172,16 @@
                 <Card neutral>
                     <h2>{recipe.name}</h2>
                     {#if recipe?.description}<p>{recipe.description}</p>{/if}
+                    <small>{new Date(parseInt(recipe.createdAt)).toLocaleDateString()}
+                        &middot;  {recipe?.category ?? ""}
+                        {#if recipe?.category && recipe?.cuisine}&middot;{/if}{recipe?.cuisine ?? ""}</small>
+                    <br>
                     <a href={`/@${recipe.author.id}`}
-                       class="text-primary dark:text-primaryDark">{recipe.author.name ?? "@" + recipe.author.username}</a>
+                       class="text-primary dark:text-primaryDark">by {recipe.author.name ?? "@" + recipe.author.username}</a>
                 </Card>
             </a>
         {/each}
-        <div><h1 class="text-center">That's all</h1>
+        <div class="my-4"><h1 class="text-center">That's all</h1>
             <p class="text-center">
                 Follow more people to see more recipes.
             </p></div>
@@ -186,5 +196,6 @@
 <style>
     a {
         --tw-bg-opacity: 0.05;
+        text-overflow: ellipsis;
     }
 </style>

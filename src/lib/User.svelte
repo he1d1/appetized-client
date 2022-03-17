@@ -3,6 +3,8 @@
 
     let url = user?.profilePicture?.url
 
+    console.log(user)
+
 </script>
 
 <a href="{`/@${user.id}`}" sveltekit:prefetch class="flex gap-2">

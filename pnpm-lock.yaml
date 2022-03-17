@@ -15,8 +15,8 @@ specifiers:
   eslint-plugin-svelte3: ^3.2.1
   postcss: ^8.4.5
   postcss-load-config: ^3.1.1
-  prettier: ^2.4.1
-  prettier-plugin-svelte: ^2.6.0
+  prettier: ^2.5.1
+  prettier-plugin-tailwindcss: ^0.1.8
   svelte: ^3.44.0
   svelte-check: ^2.2.6
   svelte-material-icons: ^1.0.3
@@ -33,8 +33,8 @@ dependencies:
 
 devDependencies:
   '@capacitor/cli': 3.4.3
-  '@sveltejs/adapter-auto': 1.0.0-next.31
-  '@sveltejs/kit': 1.0.0-next.295_svelte@3.46.4
+  '@sveltejs/adapter-auto': 1.0.0-next.33
+  '@sveltejs/kit': 1.0.0-next.299_svelte@3.46.4
   '@typescript-eslint/eslint-plugin': 5.11.0_3bf83de4bfb4bafe384c8467b43d3174
   '@typescript-eslint/parser': 5.11.0_eslint@7.32.0+typescript@4.5.5
   autoprefixer: 10.4.2_postcss@8.4.6
@@ -44,7 +44,7 @@ devDependencies:
   postcss: 8.4.6
   postcss-load-config: 3.1.2
   prettier: 2.5.1
-  prettier-plugin-svelte: 2.6.0_prettier@2.5.1+svelte@3.46.4
+  prettier-plugin-tailwindcss: 0.1.8_prettier@2.5.1
   svelte: 3.46.4
   svelte-check: 2.4.3_c4ddb7aa834c5480c17278b74d05e327
   svelte-preprocess: 4.10.3_6803f02d0d05aee7a9102a1b4611ec75
@@ -284,36 +284,36 @@ packages:
       picomatch: 2.3.1
     dev: true
 
-  /@sveltejs/adapter-auto/1.0.0-next.31:
-    resolution: {integrity: sha512-N1ZFGxulcSAOJrtdFR567diwbWKUvLrHZiUE9TiEvIahnndeRa50MF9LDg/CuIvpa6fHqz5K827XXrADlPAr9g==}
+  /@sveltejs/adapter-auto/1.0.0-next.33:
+    resolution: {integrity: sha512-FVEBSw5XIYCrqMPY2VGmaGyT4ZvbahcdQJ613O4lgAoafRdUy7ZaE8GoeDmCJxtTUsqhAQUFu7jx9IIhz+QrsQ==}
     dependencies:
-      '@sveltejs/adapter-cloudflare': 1.0.0-next.15
-      '@sveltejs/adapter-netlify': 1.0.0-next.50
-      '@sveltejs/adapter-vercel': 1.0.0-next.46
+      '@sveltejs/adapter-cloudflare': 1.0.0-next.16
+      '@sveltejs/adapter-netlify': 1.0.0-next.51
+      '@sveltejs/adapter-vercel': 1.0.0-next.47
     dev: true
 
-  /@sveltejs/adapter-cloudflare/1.0.0-next.15:
-    resolution: {integrity: sha512-kq3vNFpKmRVgAOfz4HrcleBnUADs++dfVF8S61EAFqNTEvGtOVdJKLql66Pe/uxlY0VxAp1dplxtEDf4/R70lQ==}
+  /@sveltejs/adapter-cloudflare/1.0.0-next.16:
+    resolution: {integrity: sha512-ripTRtOasAtxDJEIF3kwwji/9WHfX069i5LuRwGUzOi4/cbcGfgV1RFBVfo/8G6hr3ehqLeKCdloet1yTsp34A==}
     dependencies:
       esbuild: 0.14.21
     dev: true
 
-  /@sveltejs/adapter-netlify/1.0.0-next.50:
-    resolution: {integrity: sha512-lpHvjcHiC77SPyLp7OjhenJF9KYfKsXlmUua7icNh0Hc8SKtRQf0dn+a1Zy77AslikvOX7/4HZE8zPIyIvYYqw==}
+  /@sveltejs/adapter-netlify/1.0.0-next.51:
+    resolution: {integrity: sha512-P7/cW/0z8zd8J6DOI2yxKZG0+HRMMuzfOf0yzFXX0vRwBePhKlZ/H4qhTOo2NrCmj3Len545o+ugj5gyMXl1+g==}
     dependencies:
       '@iarna/toml': 2.2.5
       esbuild: 0.14.21
       tiny-glob: 0.2.9
     dev: true
 
-  /@sveltejs/adapter-vercel/1.0.0-next.46:
-    resolution: {integrity: sha512-6Rwf3kZF6uX2JxDMoYgZWZe5TjVTTWZa57VukdNGjnlAT3CrfsEOBWyskX/8hx7AiYX5fucZaAtYPNZpUmueIA==}
+  /@sveltejs/adapter-vercel/1.0.0-next.47:
+    resolution: {integrity: sha512-VV3vP8KqL9XOc7xfQLVhXTM5jrTme+r1qJy98u5/dhAhkdjqrGDwAKo/s7MoB3rTYxLb2b8I4QxAaoz2Y2aIBg==}
     dependencies:
       esbuild: 0.14.21
     dev: true
 
-  /@sveltejs/kit/1.0.0-next.295_svelte@3.46.4:
-    resolution: {integrity: sha512-4pO/swXByhU+7bhNikTjh1d4QxAMP9TZ74p7sdPuyJf5cg7Zrfk1nBtaMt0R+8+5j1xfC/XWRcxa3WnhT9bQMA==}
+  /@sveltejs/kit/1.0.0-next.299_svelte@3.46.4:
+    resolution: {integrity: sha512-m8VBccfX3ozgHjjz193pZbfTK02P47bqdhj07cveUEhVLwbujOVWbgblPCrNh0rkTER7z1k5hRZnWrFYaDjQJA==}
     engines: {node: '>=14.13'}
     hasBin: true
     peerDependencies:
@@ -1854,18 +1854,8 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  /prettier-plugin-svelte/2.6.0_prettier@2.5.1+svelte@3.46.4:
-    resolution: {integrity: sha512-NPSRf6Y5rufRlBleok/pqg4+1FyGsL0zYhkYP6hnueeL1J/uCm3OfOZPsLX4zqD9VAdcXfyEL2PYqGv8ZoOSfA==}
-    peerDependencies:
-      prettier: ^1.16.4 || ^2.0.0
-      svelte: ^3.2.0
-    dependencies:
-      prettier: 2.5.1
-      svelte: 3.46.4
-    dev: true
-
-  /prettier-plugin-tailwindcss/0.1.7_prettier@2.5.1:
-    resolution: {integrity: sha512-tmBr45hCLuit2Cz9Pwow0/Jl1bGivYGsfcF29O+3sKcE++ybjz9dfie565S3ZsvAeV8uYer9SRMBWDsHPly2Lg==}
+  /prettier-plugin-tailwindcss/0.1.8_prettier@2.5.1:
+    resolution: {integrity: sha512-hwarSBCswAXa+kqYtaAkFr3Vop9o04WOyZs0qo3NyvW8L7f1rif61wRyq0+ArmVThOuRBcJF5hjGXYk86cwemg==}
     engines: {node: '>=12.17.0'}
     peerDependencies:
       prettier: '>=2.2.0'
@@ -2274,7 +2264,7 @@ packages:
       postcss-nested: 5.0.6_postcss@8.4.6
       postcss-selector-parser: 6.0.9
       postcss-value-parser: 4.2.0
-      prettier-plugin-tailwindcss: 0.1.7_prettier@2.5.1
+      prettier-plugin-tailwindcss: 0.1.8_prettier@2.5.1
       quick-lru: 5.1.1
       resolve: 1.22.0
     transitivePeerDependencies:
