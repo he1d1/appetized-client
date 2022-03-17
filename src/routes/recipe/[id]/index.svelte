@@ -98,9 +98,9 @@
 				query: `
                     mutation ($id: ID!) {
                         saveRecipe(id: $id) {
-                            ... on Recipe { 
+                            ... on Recipe {
                                 id
-                            }   
+                            }
                             ... on Error {
                                 code
                                 message
@@ -130,9 +130,11 @@
 			};
 		}
 
-		// @ts-ignore
 		$currentRoute.buttons[0].component = Saved;
 		$currentRoute.buttons[0].click = unsaveRecipe;
+
+		$session?.user?.savedRecipes?.push(recipe.id);
+		$session.user.savedRecipes = $session?.user?.savedRecipes
 	}
 
 	async function unsaveRecipe() {
@@ -146,9 +148,9 @@
 				query: `
                     mutation ($id: ID!) {
                         unsaveRecipe(id: $id) {
-                            ... on Recipe { 
+                            ... on Recipe {
                                 id
-                            }   
+                            }
                             ... on Error {
                                 code
                                 message
@@ -181,6 +183,9 @@
 		// @ts-ignore
 		$currentRoute.buttons[0].component = NotSaved;
 		$currentRoute.buttons[0].click = saveRecipe;
+
+		$session?.user?.savedRecipes?.filter(id => id !== recipe.id);
+		$session.user.savedRecipes = $session?.user?.savedRecipes;
 	}
 
 	onMount(() => {

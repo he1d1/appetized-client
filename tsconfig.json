@@ -27,5 +27,11 @@
 			"$lib/*": ["src/lib/*"]
 		}
 	},
-	"include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.ts", "src/**/*.svelte"]
+	"include": [
+      "src/**/*.d.ts",
+      "src/**/*.js",
+      "src/**/*.ts",
+      "src/**/*.svelte",
+      "../../../../home/heidi/.local/share/JetBrains/Toolbox/apps/WebStorm/ch-0/213.6777.57/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external/lib.dom.d.ts"
+    ]
 }

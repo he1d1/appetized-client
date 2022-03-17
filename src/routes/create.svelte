@@ -53,7 +53,7 @@
                 credentials: "include",
                 body: JSON.stringify({
                     query: `
-                    mutation CreateRecipe ($name: String! $description: String $cuisine: String $category: String $base64: String!) {
+                    mutation CreateRecipe ($name: String! $description: String $cuisine: String $category: String $image: ImageInput) {
                       createRecipe(
                         recipe: {
                           name: $name
@@ -61,9 +61,7 @@
                           cuisine: $cuisine
                           category: $category
                         },
-                        image: {
-                          base64: $base64
-                        }
+                        image: $image
                       ) {
                         ... on Recipe {
                           name
@@ -81,7 +79,7 @@
                         description,
                         cuisine,
                         category,
-                        base64
+                        image: base64 ? {base64} : undefined
                     }
                 })
             }).then(res => res.json()).then(res => goto(`recipe/${res.data.createRecipe.id}`))
