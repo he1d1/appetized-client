@@ -3,6 +3,7 @@
 <script>
 	import Input from '$lib/Input.svelte';
 	import { createEventDispatcher, onMount } from 'svelte';
+	import Button from './Button.svelte';
 	export let imageValue, base64;
 	let reader;
 
@@ -22,12 +23,12 @@
 			src={base64}
 		/>{:else}Preview{/if}
 </div>
-<a
-	class="ml-auto"
+<Button
+	text
 	on:click={() => {
 		imageValue = null;
 		base64 = null;
-	}}>Remove</a
+	}}>Remove</Button
 >
 <Input
 	id="image"
@@ -37,11 +38,11 @@
 	accept=".png, .jpg, .jpeg"
 	bind:value={imageValue}
 	on:change={(e) => {
-		let image = e.target.files[0];
-		reader.readAsDataURL(image);
-		reader.onload = (e) => {
-			base64 = e.target.result;
-			dispatch('change', { base64: e.target.result });
+		let image = e?.detail?.target?.files?.[0];
+		if (image) reader.readAsDataURL(image);
+		reader.onload = () => {
+			base64 = reader.result;
+			dispatch('change', { base64 });
 		};
 	}}
 />

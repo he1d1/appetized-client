@@ -33,12 +33,7 @@
 
 	let base64, name, username;
 
-	$: console.log($bindComponent, base64, name, username);
-
-	$: console.log($session);
-
 	$: $bindComponent?.$on('change', (data) => {
-		console.log('change', data.detail);
 		base64 = data.detail?.base64;
 		name = data.detail?.name;
 		username = data.detail?.username;
@@ -63,6 +58,7 @@
 			content: 'Change up your look',
 			// @ts-ignore
 			component: Image,
+			closable: true,
 			actions: [
 				{
 					label: 'Cancel',
@@ -118,6 +114,7 @@
 			title: 'Edit Profile',
 			content: 'Change your name or username',
 			component: _EditProfile,
+			closable: true,
 			actions: [
 				{
 					label: 'Cancel',

@@ -134,7 +134,7 @@
 		$currentRoute.buttons[0].click = unsaveRecipe;
 
 		$session?.user?.savedRecipes?.push(recipe.id);
-		$session.user.savedRecipes = $session?.user?.savedRecipes
+		$session.user.savedRecipes = $session?.user?.savedRecipes;
 	}
 
 	async function unsaveRecipe() {
@@ -184,7 +184,7 @@
 		$currentRoute.buttons[0].component = NotSaved;
 		$currentRoute.buttons[0].click = saveRecipe;
 
-		$session?.user?.savedRecipes?.filter(id => id !== recipe.id);
+		$session?.user?.savedRecipes?.filter((id) => id !== recipe.id);
 		$session.user.savedRecipes = $session?.user?.savedRecipes;
 	}
 
@@ -212,10 +212,7 @@
 				click: () => goto(`/recipe/${recipe.id}/edit`)
 			});
 		}
-		console.log($currentRoute);
 	});
-
-	$: console.log(recipe);
 </script>
 
 <article class="flex flex-col gap-4">
@@ -242,11 +239,14 @@
 	{:else}
 		<ul>
 			{#each recipe?.ingredients as ingredient}
-				<li class="flex items-center before:content-['•'] ml-2 before:-ml-2 before:mr-2">
-					{ingredient.quantity}
-					{#if isNaN(parseInt(ingredient.quantity))}of{/if}
-					{ingredient.name}
-				</li>
+				{#if ingredient.quantity !== '' && ingredient.name !== ''}<li
+						class="flex items-center before:content-['•'] ml-2 before:-ml-2 before:mr-2"
+					>
+						{ingredient.quantity}
+						{#if isNaN(parseInt(ingredient.quantity))}of{/if}
+						{ingredient.name}
+					</li>
+				{/if}
 			{/each}
 		</ul>
 	{/if}

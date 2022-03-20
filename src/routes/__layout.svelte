@@ -72,10 +72,14 @@
 		id="modal"
 		transition:fade={{ duration: 100 }}
 		class:danger={$modal?.danger}
-		class="absolute inset-0 z-40"
-		on:click={() => ($modal = $modal?.closable ? undefined : $modal)}
+		class="absolute inset-0 z-50"
 	>
-		<div class="flex items-center justify-center h-full">
+		<div
+			class="flex items-center justify-center h-full"
+			on:click|self={() => {
+				if (modal?.closable) $modal = undefined;
+			}}
+		>
 			<div
 				class="bg-surface dark:bg-surfaceDark p-4 m-4 rounded-lg text-onSurface dark:text-onSurfaceDark flex flex-col gap-2 w-full"
 			>
