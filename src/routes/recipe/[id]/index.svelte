@@ -259,6 +259,17 @@
 		{#each recipe?.steps as step, i}
 			<Card neutral>
 				<h3>{i + 1}. {step?.name ?? ''}</h3>
+				{#if step?.image?.url}
+								<div class="relative">
+									<div>
+										<img
+											class="my-2 rounded-lg max-h-[50vh] object-cover"
+											src={step.image.url}
+											alt={step.content}
+										/>
+									</div>
+								</div>
+							{/if}
 				<p>{step.content}</p>
 			</Card>
 		{/each}
